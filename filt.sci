@@ -1,4 +1,4 @@
-// Implements difference equation:
+// Filters a data sequence using a digital filter
 // a(1)*y(n) = b(1)*x(n) + b(2)*x(n-1) + ... + b(nb+1)*x(n-nb)
 // - a(2)*y(n-1) - ... - a(na+1)*y(n-na)
  
