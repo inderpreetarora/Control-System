@@ -1,7 +1,8 @@
-// Updated(10-12-06)
-// Covariance for zero mean processes
-// Calculated through convolution
+// Updated (5-4-07)
+// Covariance computation of zero mean processes
+// Calculation by convolution
 // Ref.: pg.164, Digital Control, Prof.Kannan Moudgalya
+
 function [xcov,nxcov] = xcovz(x,y)
 if argn(2) == 1
 y = x;
