@@ -1,6 +1,7 @@
 // ARX model parameter estimation
 // Computes Covariance matrix
 // Computes Noisevariance of a process
+// Updated(26-9-16)
 
 function [thetaN,covt,nvar,res] = arx(data,na,nb,nk)
 az = max(na,nb+nk-1);
@@ -36,7 +37,6 @@ thetaN = inv(rm)*qm'*m2;
 a = thetaN(1:na); b = thetaN(na+1:r1);
 
 // Sum of squared residuals
-
 yhat = phit'*thetaN;
 res = zd(:,1) - yhat;
 N = length(res);
@@ -47,8 +47,8 @@ nvar = sqrt(sig2);
 cov = inv(m1);
 covt = diag(cov);
 
-a = thetaN(1:na); b = thetaN(na+1:r1);
-cova = covt(1:na); covb = covt(na+1:r1);
+a = thetaN(1:na); b = thetaN(na+1:r1); pause
+cova = covt(1:na); covb = covt(na+1:r1); pause
 x = poly(0,'x');
 disp('Discrete time model: A(x)y(t) = B(x)u(t) + e(t)');
 A = poly([1 a'],'x','coeff');
@@ -67,9 +67,10 @@ cov_b = covb';
 function disp_mod(N,covN)
 len = length(covN);
 B1 = pol2str(N);
-ind = strindex(B1,['+','-']);  
-ind = ind - 1;
-B2 = strsplit(B1,ind);
+ind = strindex(B1,['+','-']);  //pause
+ind = ind - 1; //pause
+if ind~=-1 then B2 = strsplit(B1,ind);//pause
+else B2 = B1;  end;
 covB = string(covN);
   
   if ascii(B2(1)) == 32
