@@ -1,4 +1,5 @@
 // OE Model parameter estimation
+// Updated(28-9-16)
 
 ///////////////////////////////////////
 /////////// ARX Model /////////////////
@@ -12,21 +13,21 @@ zd = data;
 zd1(:,1) = [zer; zd(:,1)];
 zd1(:,2) = [zer; zd(:,2)];
 [r,c] = size(zd1);
-t = az+1:r;
+t = az+1:r; 
 yt = zd1(:,1); ut = zd1(:,2);
 yt1 = yt'; ut1 = ut'; // row vector
-len1 = length(yt1);
-yt2 = zeros(1,len1-az); ut2 = zeros(1,len1-az);
+len1 = length(yt1); 
+yt2 = zeros(1,len1-az); ut2 = zeros(1,len1-az); 
 
 // arx(Data,[na nb nk]) 
   for i=1:na
     yt2 = [yt2; -yt1(t-i)];
   end;
   for i=nk:nb+nk-1
-    ut2 = [ut2; ut1(t-i)];
+    ut2 = [ut2; ut1(t-i)]; 
   end;
 [r1,c1] = size(yt2); [r2,c2] = size(ut2);
-phit = [yt2(2:r1,:); ut2(2:r2,:)];
+phit = [yt2(2:r1,:); ut2(2:r2,:)]; 
 m1 = phit*phit';
 [qm,rm] = qr(m1);
 m2 = phit*zd(:,1);
@@ -57,10 +58,11 @@ endfunction;
 
 function disp_mod(N1,covN1)
 len = length(covN1);
-B1 = pol2str(N1);
+B1 = pol2str(N1); 
 ind = strindex(B1,['+','-']);  
 ind = ind - 1;
-B2 = strsplit(B1,ind);
+if ind~=-1 then B2 = strsplit(B1,ind); 
+else B2 = B1;  end;
 covB = string(covN1);
   
   if ascii(B2(1)) == 32
@@ -72,7 +74,7 @@ covB = string(covN1);
     B3(i) = strsubst(B2(i),'*x','(+-' + covB(i) + ')*x');
   end;
 
-  B4 = B3(1);
+  B4 = B3(1); //disp(15); pause
   
   for i=2:len
   B4 = B4 + ' ' + B3(i);
@@ -85,28 +87,29 @@ endfunction;
 
 function [thetaN_oe,covN_oe,nvar,resid] = oe(zd,nb,nf,nk)
 exec('deconvol.sci',-1);
-[thetaN,covfN,nvar,res] = arxc(zd,nf,nb,nk);
+[thetaN,covfN,nvar,res] = arxc(zd,nf,nb,nk); 
 [r1,c1] = size(thetaN);
-yt = zd(:,1);
+yt = zd(:,1); ut = zd(:,2);
 m=50;
   if nf==0
     thetaN_oe = thetaN;
     covN_oe = covfN;
+    resid = res;
   else
     for k=1:m
       a = thetaN(1:nf);
-      b = thetaN(nf+1:r1);
+      b = thetaN(nf+1:r1);  
       A = [1 a']; // Filter
-      y = yt(1:length(u))';
+      y = yt(1:length(ut))';
       yf = deconvol(y,A);
-      uf = deconvol(u,A);
-      zf = [yf(1:length(uf))' uf'];
+      uf = deconvol(ut',A); 
+      zf = [yf(1:length(uf))' uf']; 
       zdf = detrend(zf,'constant');
-      [thetaNf,covf_a,nvar,resid] = arxc(zdf,nf,nb,nk)
+      [thetaNf,covf_a,nvar,resid] = arxc(zdf,nf,nb,nk); 
       thetaN = thetaNf;
       a1 = thetaN(1:nf);
-      b = (norm(a-a1))/norm(a1);
-        if b<0.005
+      ba = (norm(a-a1))/norm(a1); 
+        if ba<0.005
           break;
         end;
     end;
@@ -131,7 +134,7 @@ B = poly( b_oe,'x','coeff');
 cov_b1 = cov_b';
 
   if nb==0
-    error('All B parameters are zero');
+    error('Polynomial B is zero');
   else
     disp('B(x) = ');
     disp_mod(B,cov_b);
